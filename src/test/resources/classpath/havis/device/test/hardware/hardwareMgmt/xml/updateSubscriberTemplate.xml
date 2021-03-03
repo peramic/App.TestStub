@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="c1">
+		<update operationId="o1">
+			<subscribers>
+				<subscriber subscriberId="s1">
+					<instance />
+					<ios>
+						<io ioId="5">
+							<stateChanged>false</stateChanged>
+						</io>
+					</ios>
+				</subscriber>
+			</subscribers>
+		</update>
+	</request>
+</hardwareOperation>

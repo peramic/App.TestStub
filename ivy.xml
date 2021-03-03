@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="havis/device/test" module="hardware" default="true" />
+
+	<configurations>
+		<conf name="default" />
+		<conf name="runtime-io" />
+		<conf name="runtime-rf" />
+		<conf name="standalone" />
+	</configurations>
+
+	<dependencies>
+		<dependency org="havis/net" name="apps-${platform}" rev="${havis.version}" conf="standalone->default" />
+
+		<dependency org="havis/device/io" name="common" rev="${havis.version}" conf="runtime-io,standalone->deb" transitive="false" />
+		<dependency org="havis/device/rf" name="common" rev="${havis.version}" conf="runtime-rf,standalone->deb" transitive="false" />
+		<dependency org="havis/device/test" name="io" rev="${havis.version}" conf="runtime-io,standalone->deb" transitive="false" />
+		<dependency org="havis/device/test" name="rf" rev="${havis.version}" conf="runtime-rf,standalone->deb" transitive="false" />
+	
+		<dependency org="com/fasterxml/jackson/core" name="jackson-annotations" rev="${jackson.version}" conf="default" />
+
+		<dependency org="com/beust" name="jcommander" rev="${jcommander.version}" conf="default" />
+		<dependency org="havis/net/server" name="http" rev="${havis.version}" conf="default" />
+
+		<dependency org="org/jboss/resteasy" name="resteasy-jaxrs" rev="${resteasy.version}" conf="default" />
+		<dependency org="org/jboss/resteasy" name="resteasy-client" rev="${resteasy.version}" conf="default" />
+		<dependency org="org/jboss/resteasy" name="resteasy-jackson2-provider" rev="${resteasy.version}" conf="default" />
+
+		<dependency org="org/apache/httpcomponents" name="httpclient" rev="${httpclient.version}" conf="default" />
+		<dependency org="org/apache/httpcomponents" name="httpcore" rev="${httpcore.version}" conf="default" />
+
+		<dependency org="commons-io" name="commons-io" rev="${commons-io.version}" conf="default" />
+		<dependency org="commons-codec" name="commons-codec" rev="${commons-codec.version}" conf="default" />
+
+		<dependency org="org/jmockit" name="jmockit" rev="${jmockit.version}" conf="default" />
+		<dependency org="org/testng" name="testng" rev="${testng.version}" conf="default" />
+
+		<dependency org="org/osgi" name="org.osgi.core" rev="${osgi.version}" conf="default" />
+
+		<dependency org="com/sun/xml/bind" name="jaxb-xjc" rev="${jaxb.version}" conf="default" />
+		<dependency org="com/sun/xml/bind" name="jaxb-impl" rev="${jaxb.version}" conf="default" />
+		<dependency org="org/jvnet/jaxb2_commons" name="jaxb2-basics-annotate" rev="${jaxb2-basics-annotate}" conf="default" />
+	</dependencies>
+
+</ivy-module>

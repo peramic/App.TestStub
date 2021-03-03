@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="c1">
+		<read operationId="o1">
+			<ios>
+				<ioId>10</ioId>
+			</ios>
+		</read>
+	</request>
+</hardwareOperation>

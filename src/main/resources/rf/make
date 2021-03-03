@@ -1,0 +1,68 @@
+#!/bin/sh
+
+. /etc/profile
+
+APP=$(realpath $0)
+
+NAME=havis.device.test.hardware.rf
+DEPS="havis.device.test.hardware havis.device.rf havis.device.test.rf"
+INFO=/opt/havis-apps/info
+EXIT=0
+
+do_install()
+{
+  TMP=$(mktemp -d)
+  cd $TMP
+  sed '1,/^#EOF#$/d' "$APP" | tar x
+  for dep in $DEPS; do
+    dpkg -i $dep\.deb
+  done
+  cd -
+  rm -r $TMP
+}
+
+do_extract()
+{
+  TMP=$(mktemp -d)
+  cd $TMP
+  sed '1,/^#EOF#$/d' "$APP" | tar x
+  for dep in $DEPS; do
+    dpkg -x $dep\.deb $TARGET
+  done
+  cd -
+  rm -r $TMP
+}
+
+do_remove()
+{
+  rm $INFO/$NAME.app
+  for dep in $(echo $DEPS | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'); do
+    dpkg -r $dep
+  done
+}
+
+case "$1" in
+  name)
+    echo $NAME.app
+    ;;
+  install)
+    echo "Installing $NAME"
+    do_install
+    ;;
+  extract)
+    echo "Extracting $NAME"
+    do_extract
+    ;;
+  remove)
+    echo "Removing $NAME"
+    do_remove
+    ;;
+  *)
+    echo "Usage: $NAME {install|remove}"
+    exit 1
+    ;;
+esac
+
+exit $EXIT
+
+#EOF#

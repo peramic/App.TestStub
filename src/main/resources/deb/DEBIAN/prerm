@@ -1,0 +1,10 @@
+#!/bin/sh
+
+URL="http://admin@localhost/rest/apps"
+PKG="10_@Bundle-SymbolicName@.fragment.jar 40_@Bundle-SymbolicName@.jar"
+
+for pkg in $PKG; do
+  busybox wget $URL/$pkg/unplug -q --spider
+done
+
+exit 0

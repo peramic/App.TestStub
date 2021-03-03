@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:havis:device:test:hardware:xsd:1" elementFormDefault="qualified" xmlns="urn:havis:device:test:hardware:xsd:1" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+
+	<xs:include schemaLocation="./hardwareBase.xsd" />
+
+	<xs:element name="hardwareOperation" type="HardwareOperationType" />
+
+	<xs:complexType name="HardwareOperationType">
+		<xs:choice>
+			<xs:element name="request" type="RequestType" maxOccurs="unbounded" />
+			<xs:element name="response" type="ResponseType" maxOccurs="unbounded" />
+			<xs:element name="notification" type="NotificationType" />
+		</xs:choice>
+		<xs:attribute name="schemaVersion" type="SchemaVersionType">
+			<xs:annotation>
+				<xs:documentation> If the attribute does not exists the newest
+					supported version of the hardware implementation is assumed.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<!-- request -->
+
+	<xs:complexType name="RequestType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="create" type="RequestCreateType">
+				<xs:annotation>
+					<xs:documentation>Creates a hardware configuration, antennas and/or
+						tags. If no antennas or tags are given then a new hardware
+						configuration is created. Initial hardware data are loaded from an
+						existing XML file. If a configuration with the given identifier
+						already exists then error code 501 is returned.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="delete" type="RequestDeleteType">
+				<xs:annotation>
+					<xs:documentation>Deletes a hardware configuration, antennas and/or
+						tags. If no antennas or tags are given then an existing
+						configuration is deleted. If the configuration with the given
+						identifier
+						does not exists then nothing is done.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="read" type="RequestReadType">
+				<xs:annotation>
+					<xs:documentation>Reads antennas and/or tags.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="update" type="RequestUpdateType">
+				<xs:annotation>
+					<xs:documentation>Updates antennas and/or tags.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="configId" type="IdType" use="required">
+			<xs:annotation>
+				<xs:documentation> The identifier of the hardware configuration
+					for
+					which the request shall be executed. If the configuration does
+					not
+					exist and it shall not be created or deleted then error code
+					500 is
+					returned.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:attributeGroup name="OperationPropertiesAttrGroup">
+		<xs:attribute name="operationId" type="IdType" use="required" />
+	</xs:attributeGroup>
+
+	<xs:complexType abstract="true" name="RequestAbstractType" />
+
+	<!-- request create -->
+
+	<xs:complexType name="RequestCreateType">
+		<xs:complexContent>
+			<xs:extension base="RequestAbstractType">
+				<xs:sequence>
+					<xs:element name="antennas" type="RequestCreateAntennasType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Creates antennas. If an antennaId already exist
+								then error code 101 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="tags" type="RequestCreateTagsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Creates tags and assigns them to antennas. The
+								given tagIds are created by the client and are not used for
+								internal purposes. The stub generates own identifiers for the tags
+								which must be used by the client for further operations on the
+								tags. The response contains the mappings from the given client
+								tagIds to the generated ones. If an antennaIds does not exist then
+								no antenna is
+								created and error code 100 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ios" type="RequestCreateIOsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Creates GPIOs. If a GPIO with the id already
+								exist then error code 301 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="subscribers" type="RequestCreateSubscribersType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Creates subscribers. The given subscriberIds are
+								created by the client and are not used for internal purposes. The
+								stub generates own identifiers for the tags which must be used by
+								the client for further operations on the subscribers. The response
+								contains the mappings from the given client subscriberIds to the
+								generated ones. If the subscriber instance does not implement the
+								interface HardwareSubscriber then error code 602 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateAntennasType">
+		<xs:sequence>
+			<xs:element name="antenna" type="RequestCreateAntennaType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateAntennaType">
+		<xs:sequence>
+			<xs:group ref="AntennaPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="AntennaPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateTagsType">
+		<xs:sequence>
+			<xs:element name="tag" type="RequestCreateTagType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateTagType">
+		<xs:sequence>
+			<xs:group ref="TagPropertiesElemGroup" />
+			<xs:element name="antennas" type="RequestCreateTagAntennasType" />
+		</xs:sequence>
+		<xs:attributeGroup ref="TagPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateTagAntennasType">
+		<xs:sequence>
+			<xs:element name="antenna" type="RequestCreateTagAntennaType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateTagAntennaType">
+		<xs:sequence>
+			<xs:group ref="AntennaTagPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attribute name="antennaId" type="AntennaIdType" />
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateIOsType">
+		<xs:sequence>
+			<xs:element name="io" type="RequestCreateIOType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateIOType">
+		<xs:sequence>
+			<xs:group ref="IOPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="IOPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateSubscribersType">
+		<xs:sequence>
+			<xs:element name="subscriber" type="RequestCreateSubscriberType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestCreateSubscriberType">
+		<xs:sequence>
+			<xs:group ref="SubscriberPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="SubscriberPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- request delete -->
+
+	<xs:complexType name="RequestDeleteType">
+		<xs:complexContent>
+			<xs:extension base="RequestAbstractType">
+				<xs:sequence>
+					<xs:element name="antennas" type="RequestDeleteAntennasType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Deletes antennas and its assignments to tags. If
+								a released tag is not assigned to any other antenna any more then
+								the tag is also deleted. If an antennaId does not exist then
+								nothing is done. If no antennaId is given then all antennas and
+								its tags are deleted.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="tags" type="RequestDeleteTagsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Deletes tags and their assignments to antennas.
+								If no tagId is given then all tags are deleted.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ios" type="RequestDeleteIOsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Deletes antennas and its assignments to tags. If
+								a released tag is not assigned to any other antenna any more then
+								the tag is also deleted. If an antenna with the id does not exist
+								then nothing is done. If no antennaId is given then all antennas
+								and its tags are deleted.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="subscribers" type="RequestDeleteSubscribersType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Deletes subscribers. If a subscriber with the id
+								does not exist then nothing is done. If no subscriberId is given
+								then all subscribers are deleted.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="RequestDeleteAntennasType">
+		<xs:sequence>
+			<xs:element name="antennaId" type="AntennaIdType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>If this element is omitted then all antennas are
+						deleted.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestDeleteTagsType">
+		<xs:sequence>
+			<xs:element name="tagId" type="IdType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestDeleteIOsType">
+		<xs:sequence>
+			<xs:element name="ioId" type="IOIdType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RequestDeleteSubscribersType">
+		<xs:sequence>
+			<xs:element name="subscriberId" type="IdType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- request read -->
+
+	<xs:complexType name="RequestReadType">
+		<xs:complexContent>
+			<xs:extension base="RequestAbstractType">
+				<xs:sequence>
+					<xs:element name="antennas" type="RequestDeleteAntennasType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Gets antenna data including assigned tagIds. If
+								an antenna with the id does not exist then error code 100 is
+								returned. If no antennaId is given then all antennas are returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="tags" type="RequestDeleteTagsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Gets tag data including the antennaIds. If a tag
+								with the id does not exist then error code 200 is returned. If no
+								tagId is given then all tags are returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ios" type="RequestDeleteIOsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Gets GPIO data. If a GPIO with the id does not
+								exist then error code 300 is returned. If no GPIOId is given then
+								all GPIOs are returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="subscribers" type="RequestDeleteSubscribersType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Gets subscriber data. If a subscriber with the id
+								does not exist then error code 600 is returned. If no subscriberId
+								is given then all subscribers are returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- request update -->
+
+	<xs:complexType name="RequestUpdateType">
+		<xs:complexContent>
+			<xs:extension base="RequestAbstractType">
+				<xs:sequence>
+					<xs:element name="antennas" type="RequestCreateAntennasType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Updates antennas. If an antenna with the id does
+								not exist then error code 100 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="tags" type="RequestCreateTagsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Updates tags and replaces existing assignments to
+								antennas. If a tag with the id does not exist then error code 200
+								is returned. If an antenna identifier does not exist then error
+								code 100 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ios" type="RequestCreateIOsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Updates GPIOs. If a GPIO with the id does not
+								exist then error code 300 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="subscribers" type="RequestCreateSubscribersType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Updates subscribers. If a subscriber with the id
+								does not exist then error code 600 is returned.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- response -->
+
+	<xs:complexType name="ResponseType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="create" type="ResponseCreateType" />
+			<xs:element name="delete" type="ResponseDeleteType" />
+			<xs:element name="read" type="ResponseReadType" />
+			<xs:element name="update" type="ResponseUpdateType" />
+			<xs:element name="error" type="ResponseErrorType">
+				<xs:annotation>
+					<xs:documentation>Returns error informations of an operation. If
+						this element is returned then all previous changes have been
+						rolled back and no further operations have been processed.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="configId" type="IdType" use="required">
+			<xs:annotation>
+				<xs:documentation> The identifier of the hardware configuration for
+					which the request has been executed.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<!-- response create -->
+
+	<xs:complexType name="ResponseCreateType">
+		<xs:sequence>
+			<xs:element name="tags" type="ResponseCreateTagsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the generated tagIds of created tags.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subscribers" type="ResponseCreateSubscribersType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the generated subscriberIds of created
+						subscribers.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="ResponseCreateTagsType">
+		<xs:sequence>
+			<xs:element name="tagIds" type="ResponseCreateTagIdsType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ResponseCreateTagIdsType">
+		<xs:sequence>
+			<xs:element name="clientTagId" type="IdType">
+				<xs:annotation>
+					<xs:documentation>The tagId which was provided initially by the
+						client
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tagId" type="IdType">
+				<xs:annotation>
+					<xs:documentation>A client independant unique tagId which has been
+						generated by the stub and must be used for all further operations
+						on the tag.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ResponseCreateSubscribersType">
+		<xs:sequence>
+			<xs:element name="subscriberIds" type="ResponseCreateSubscriberIdsType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ResponseCreateSubscriberIdsType">
+		<xs:sequence>
+			<xs:element name="clientSubscriberId" type="IdType">
+				<xs:annotation>
+					<xs:documentation>The subscriberId which was provided initially by
+						the
+						client
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subscriberId" type="IdType">
+				<xs:annotation>
+					<xs:documentation>A client independant unique subscriberId which
+						has been generated by the stub and must be used for all further
+						operations on the subscriber.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- response delete -->
+
+	<xs:complexType name="ResponseDeleteType">
+		<xs:sequence />
+		<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- response read -->
+
+	<xs:complexType name="ResponseReadType">
+		<xs:sequence>
+			<xs:element name="antennas" type="ResponseReadAntennasType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the requested antenna data including all
+						referenced tagIds.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tags" type="RequestCreateTagsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the requested tag data including the
+						referenced antennaIds.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ios" type="RequestCreateIOsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the requested GPIO data.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subscribers" type="RequestCreateSubscribersType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Returns the requested subscriber data.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="ResponseReadAntennasType">
+		<xs:sequence>
+			<xs:element name="antenna" type="ResponseReadAntennaType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ResponseReadAntennaType">
+		<xs:sequence>
+			<xs:group ref="AntennaPropertiesElemGroup" />
+			<xs:element name="tags" type="ResponseReadAntennaTagsType" minOccurs="0" />
+		</xs:sequence>
+		<xs:attributeGroup ref="AntennaPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="ResponseReadAntennaTagsType">
+		<xs:sequence>
+			<xs:element name="tagId" type="IdType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- response update -->
+
+	<xs:complexType name="ResponseUpdateType">
+		<xs:sequence />
+		<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- response error -->
+
+	<xs:complexType name="ResponseErrorType">
+		<xs:sequence>
+			<xs:element name="code" type="xs:unsignedInt" />
+			<xs:element name="description" type="xs:string" />
+		</xs:sequence>
+		<xs:attributeGroup ref="OperationPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- notification -->
+	<xs:complexType name="NotificationType">
+		<xs:sequence>
+			<xs:element name="ios" type="NotificationIOsType" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="configId" type="IdType" use="required">
+			<xs:annotation>
+				<xs:documentation>The identifier of the hardware configuration for
+					which the listener has been registered.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="NotificationIOsType">
+		<xs:sequence>
+			<xs:element name="io" type="NotificationIOType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="NotificationIOType">
+		<xs:sequence>
+			<xs:element name="stateChanged" type="NotificationIOsStateChangedType" />
+		</xs:sequence>
+		<xs:attribute name="ioId" type="IOIdType" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="NotificationIOsStateChangedType">
+		<xs:sequence>
+			<xs:element name="old" type="IOStateEnumeration" />
+			<xs:element name="new" type="IOStateEnumeration" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

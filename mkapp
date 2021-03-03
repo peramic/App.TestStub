@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+set -x
+
+env
+
+. /usr/share/mkapp/functions
+
+set_env all
+ant_build -Dapp=${APP:-false}
+
+if [ "$PUBLISH" ]; then
+  publish_ivy ivy
+fi
+
+if [ "$RELEASE" ]; then
+  cd target
+  APP=havis.device.test.stubs
+  zip ../${APP}.zip *.app
+  cd -
+  echo "::set-output name=APP::${APP}.zip"
+fi

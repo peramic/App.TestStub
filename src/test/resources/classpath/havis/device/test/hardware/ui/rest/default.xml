@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardware configId="default" xmlns="urn:havis:device:test:hardware:xsd:1">
+	<antennas>
+		<antenna antennaId="1">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+			<tags>
+				<tag tagId="tag1">
+					<peakRSSI>-10</peakRSSI>
+				</tag>
+			</tags>
+		</antenna>
+	</antennas>
+	<tags>
+		<tag tagId="tag1">
+			<memoryBanks>
+				<memoryBank name="PwdBank">
+					<!-- killPwd: 0xAFFE0001, accessPwd: 0x12340001 -->
+					<data>AFFE000112340001</data>
+				</memoryBank>
+				<memoryBank name="EPCBank">
+					<!-- CRC: 16 bits, EPCLength: 6 (5 bit), UserMemoryIndicator: 1 (1 bit), 
+						XPCIndicator: 0 (1 bit), Toggle: 0 (1 bit, 0: bank contains EPC), AFI: 0x11, 
+						EPC: 0x300D964A3120004000000001 (urn:epc:tag:sgtin-96:0.426025746.0001.1) -->
+					<data>00003411300D964A3120004000000001</data>
+				</memoryBank>
+				<memoryBank name="TIDBank">
+					<!-- ISO/IEC 15963 AllocationClassIdentifier: 0xE2, MaskDesignerId: 
+						111, TagModelNumber: 0x001 -->
+					<data>E2111001</data>
+				</memoryBank>
+				<memoryBank name="UserBank">
+					<data>1234</data>
+				</memoryBank>
+			</memoryBanks>
+		</tag>
+	</tags>
+	<ios>
+		<io ioId="1">
+			<direction>Input</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="2">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+	</ios>
+</hardware>

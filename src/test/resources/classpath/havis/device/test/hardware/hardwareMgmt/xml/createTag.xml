@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="c1">
+		<create operationId="o2">
+			<tags>
+				<tag tagId="t1">
+					<memoryBanks>
+						<memoryBank name="EPCBank">
+							<data>0x101112</data>
+						</memoryBank>
+					</memoryBanks>
+					<antennas>
+						<antenna antennaId="1">
+							<peakRSSI>3</peakRSSI>
+						</antenna>
+					</antennas>
+				</tag>
+			</tags>
+		</create>
+	</request>
+</hardwareOperation>

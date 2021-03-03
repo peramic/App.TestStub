@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardware configId="invalidHardware" xmlns="urn:havis:device:test:hardware:xsd:1">
+	<antennas>
+		<antenna antennaId="A">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+			<tags>
+				<tag tagId="t1">
+					<peakRSSI>3</peakRSSI>
+				</tag>
+			</tags>
+		</antenna>
+	</antennas>
+	<tags>
+		<tag tagId="t1">
+			<memoryBanks>
+				<memoryBank name="EPCBank">
+					<data>0x101213</data>
+				</memoryBank>
+			</memoryBanks>
+		</tag>
+	</tags>
+</hardware>

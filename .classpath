@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/resources/classpath"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" output="target/test/classes" path="src/test/resources/classpath"/>
+	<classpathentry excluding="resources/classpath/" kind="src" output="target/test/classes" path="src/test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<accessrules>
+			<accessrule kind="accessible" pattern="com/sun/net/httpserver/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=Device.Test.Hardware&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
+	<classpathentry kind="lib" path="target/jaxb/classes" sourcepath="target/jaxb/src"/>
+	<classpathentry kind="output" path="target/classes"/>
+	<referencedentry kind="lib" path="target/lib/havis.device.hardware-jibx-0.2.0.jar" sourcepath="target/jibx/src"/>
+</classpath>

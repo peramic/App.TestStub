@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="c1">
+		<delete operationId="o1">
+			<antennas>
+				<antennaId>1</antennaId>
+			</antennas>
+		</delete>
+	</request>
+</hardwareOperation>

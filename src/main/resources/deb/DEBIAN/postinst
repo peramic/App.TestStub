@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /etc/profile
+
+URL="http://admin@localhost/rest/apps"
+PKG="40_@Bundle-SymbolicName@.jar 10_@Bundle-SymbolicName@.fragment.jar"
+
+for pkg in $PKG; do
+  busybox wget $URL/$pkg/plug -q --spider
+done
+
+exit 0

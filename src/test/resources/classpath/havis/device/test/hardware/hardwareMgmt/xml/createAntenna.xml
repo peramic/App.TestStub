@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="c1">
+		<create operationId="o1">
+			<antennas>
+				<antenna antennaId="1">
+					<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+				</antenna>
+			</antennas>
+		</create>
+	</request>
+</hardwareOperation>

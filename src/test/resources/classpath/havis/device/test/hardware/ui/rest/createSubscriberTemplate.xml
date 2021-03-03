@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="default">
+		<create operationId="o1">
+			<subscribers>
+				<subscriber subscriberId="s1">
+					<instanceProperties>
+						<instanceProperty key="URL">callbackURL
+						</instanceProperty>
+					</instanceProperties>
+					<ios>
+						<io ioId="1">
+							<stateChanged>true</stateChanged>
+						</io>
+					</ios>
+				</subscriber>
+			</subscribers>
+		</create>
+	</request>
+</hardwareOperation>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardware configId="default" xmlns="urn:havis:device:test:hardware:xsd:1">
+	<antennas>
+		<antenna antennaId="1">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+		</antenna>
+		<antenna antennaId="2">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+		</antenna>
+		<antenna antennaId="3">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+		</antenna>
+		<antenna antennaId="4">
+			<airProtocol>EPCGlobalClass1Gen2</airProtocol>
+		</antenna>
+	</antennas>
+	<ios>
+		<io ioId="1">
+			<direction>Input</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="2">
+			<direction>Input</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="3">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="4">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="5">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="6">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="7">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+		<io ioId="8">
+			<direction>Output</direction>
+			<state>Low</state>
+		</io>
+	</ios>
+</hardware>

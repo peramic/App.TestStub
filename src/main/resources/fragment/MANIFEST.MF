@@ -1,0 +1,9 @@
+Bundle-Name: Ha-VIS Test Hardware Fragment
+Bundle-SymbolicName: havis.device.test.hardware.fragment
+Bundle-Version: 2.7.0
+Implementation-Version: 2.7
+Bundle-ManifestVersion: 2
+Bundle-Vendor: HARTING IT_SD
+Fragment-Host: havis.util.context
+Import-Package: 
+ havis.device.test.hardware;resolution:=optional

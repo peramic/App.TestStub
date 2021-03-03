@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="havis/device/test" module="stub" default="true" />
+
+	<configurations>
+		<conf name="app" />
+		<conf name="app-io" />
+		<conf name="app-rf" />
+	</configurations>
+
+	<publications>
+		<artifact name="havis.device.test.stub.io" type="app" conf="app,app-io" />
+		<artifact name="havis.device.test.stub.rf" type="app" conf="app,app-rf" />
+	</publications>
+
+</ivy-module>

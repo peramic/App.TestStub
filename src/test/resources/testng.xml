@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Test Suite">
+	<test name="Test">
+		<packages>
+			<package name="havis.device.test.hardware" />
+			<package name="havis.device.test.hardware.hardwareMgmt" />
+			<package name="havis.device.test.hardware.hardwareMgmt.xml" />
+			<package name="havis.device.test.hardware.osgi" />
+			<package name="havis.device.test.hardware.ui.rest" />
+		</packages>
+	</test>
+</suite>

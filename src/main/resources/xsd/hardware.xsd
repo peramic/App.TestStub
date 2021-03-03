@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:havis:device:test:hardware:xsd:1"
+	elementFormDefault="qualified" xmlns="urn:havis:device:test:hardware:xsd:1"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+
+	<xs:include schemaLocation="./hardwareBase.xsd" />
+
+	<xs:element name="hardware" type="HardwareType" />
+
+	<xs:complexType name="HardwareType">
+		<xs:sequence>
+			<xs:element name="antennas" type="AntennasType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The list of existing antennas</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tags" type="TagsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The list of tags which are assigned to antennas
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ios" type="IOsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The list of GPIOs
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="runtime" type="RuntimeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This element contains data which cannot be
+						persisted. The data can only be managed during runtime.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="configId" type="IdType" use="required">
+			<xs:annotation>
+				<xs:documentation>An identifier for the described RF hardware
+					configuration
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="schemaVersion" type="SchemaVersionType">
+			<xs:annotation>
+				<xs:documentation> If the attribute does not exists the newest
+					supported version of the RF hardware implementation is assumed.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="RuntimeType">
+		<xs:sequence>
+			<xs:element name="subscribers" type="SubscribersType"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- antennas -->
+
+	<xs:complexType name="AntennasType">
+		<xs:sequence>
+			<xs:element name="antenna" type="AntennaType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="AntennaType">
+		<xs:sequence>
+			<xs:group ref="AntennaPropertiesElemGroup" />
+			<xs:element name="tags" type="AntennaTagsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The referenced tags for the antenna
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="AntennaPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<xs:complexType name="AntennaTagsType">
+		<xs:sequence>
+			<xs:element name="tag" type="AntennaTagType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="AntennaTagType">
+		<xs:sequence>
+			<xs:group ref="AntennaTagPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="AntennaTagPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- tags -->
+
+	<xs:complexType name="TagsType">
+		<xs:sequence>
+			<xs:element name="tag" type="TagType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A tag can be assigned to multiple antennas.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="TagType">
+		<xs:sequence>
+			<xs:group ref="TagPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="TagPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- GPIOs -->
+
+	<xs:complexType name="IOsType">
+		<xs:sequence>
+			<xs:element name="io" type="IOType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IOType">
+		<xs:sequence>
+			<xs:group ref="IOPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="IOPropertiesAttrGroup" />
+	</xs:complexType>
+
+	<!-- subscribers -->
+
+	<xs:complexType name="SubscribersType">
+		<xs:sequence>
+			<xs:element name="subscriber" type="SubscriberType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="SubscriberType">
+		<xs:sequence>
+			<xs:group ref="SubscriberPropertiesElemGroup" />
+		</xs:sequence>
+		<xs:attributeGroup ref="SubscriberPropertiesAttrGroup" />
+	</xs:complexType>
+</xs:schema>

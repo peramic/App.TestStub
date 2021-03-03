@@ -1,0 +1,27 @@
+Bundle-Name: Ha-VIS Test Hardware
+Bundle-Version: 2.7.0
+Implementation-Version: 2.7
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: havis.device.test.hardware
+Bundle-Description: Ha-VIS Test Hardware
+Bundle-Vendor: HARTING IT_SD
+Havis-Bundle: /OSGI-INF/havis.device.test.hardware.properties
+Main-Class: havis.device.test.hardware.server.HardwareMgmtServer
+Bundle-Activator: havis.device.test.hardware.osgi.Activator
+Export-Package: 
+ havis.device.test.hardware,
+ havis.device.test.hardware.common.serializer,
+ havis.device.test.hardware.hardwareMgmt
+Import-Package: 
+ com.fasterxml.jackson.annotation;resolution:=optional,
+ com.sun.xml.internal.bind,
+ javax.ws.rs,
+ javax.ws.rs.client,
+ javax.ws.rs.core,
+ javax.ws.rs.ext,
+ javax.xml.bind,
+ javax.xml.parsers,
+ org.osgi.framework;resolution:=optional,
+ org.w3c.dom,
+ org.w3c.dom.ls,
+ org.xml.sax

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:annox="http://annox.dev.java.net" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" extensionBindingPrefixes="annox xjc">
+
+
+	<globalBindings generateElementProperty="false" />
+
+	<bindings schemaLocation="../xsd/hardwareOperation.xsd">
+		<bindings node="/xs:schema/xs:complexType[@name='HardwareOperationType']">
+			<annox:annotate>
+				<annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="hardwareOperation" namespace="urn:havis:device:test:hardware:xsd:1" />
+			</annox:annotate>
+		</bindings>
+
+		<bindings node="/xs:schema//xs:complexType[@name='RequestType']//xs:choice">
+			<property name="choice" />
+			<annox:annotate>
+				<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonTypeInfo" use="CLASS" include="PROPERTY" property="@class" />
+				<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes">
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">RequestCreateType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">RequestDeleteType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">RequestReadType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">RequestUpdateType</annox:annotate>
+				</annox:annotate>
+			</annox:annotate>
+		</bindings>
+
+		<bindings node="/xs:schema//xs:complexType[@name='ResponseType']//xs:choice">
+			<property name="choice" />
+			<annox:annotate>
+				<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonTypeInfo" use="CLASS" include="PROPERTY" property="@class" />
+				<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes">
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">ResponseCreateType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">ResponseDeleteType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">ResponseReadType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">ResponseUpdateType</annox:annotate>
+					<annox:annotate annox:class="com.fasterxml.jackson.annotation.JsonSubTypes$Type">ResponseErrorType</annox:annotate>
+				</annox:annotate>
+			</annox:annotate>
+		</bindings>
+
+	</bindings>
+
+</bindings>

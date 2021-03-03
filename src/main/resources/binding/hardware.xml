@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:annox="http://annox.dev.java.net" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" extensionBindingPrefixes="annox xjc">
+
+	<globalBindings generateElementProperty="false" />
+
+	<bindings schemaLocation="../xsd/hardware.xsd">
+		<bindings node="/xs:schema/xs:complexType[@name='HardwareType']">
+			<annox:annotate>
+				<annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="hardware" namespace="urn:havis:device:test:hardware:xsd:1" />
+			</annox:annotate>
+		</bindings>
+	</bindings>
+
+</bindings>

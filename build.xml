@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<project name="havis.device.test.hardware" default="publish" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:if="ant:if" xmlns:unless="ant:unless">
+	<!-- Eclipse configuration:
+           Java Build Path -> Source -> src/main/java
+                                     -> src/main/resources/classpath
+                                     -> src/test/java -> Output folder: Hardware/target/test/classes
+                                     -> src/test/resources/classpath -> Output folder: Hardware/target/test/classes
+                                     -> Allow output folders for source folders
+                                     -> Default output folder: Hardware/target/classes
+                           -> Libraries -> target/havis.device.test.hardware-jibx*.jar  
+                                        -> all libraries from directory "target/ivy/compile"
+           TestNG plugin:
+             TestNG -> Output directory: /target/test/reports
+    -->
+
+	<property file="${basedir}/build.properties" />
+	<property name="basename" value="${ant.project.name}" />
+	<property name="build.dir" location="${basedir}/target" />
+	<property name="build.dir.classes" location="${basedir}/target/classes" />
+	<property name="build.dir.test" location="${build.dir}/test" />
+	<property name="build.dir.test.classes" location="${build.dir}/test/classes" />
+	<property name="doc.dir" location="${build.dir}/doc" />
+
+	<property name="src.main.dir" location="${basedir}/src/main/java" />
+	<property name="src.test.dir" location="${basedir}/src/test/java" />
+	<property name="resources.dir" location="${basedir}/src/main/resources" />
+	<property name="resources.dir.classpath" location="${basedir}/src/main/resources/classpath" />
+
+	<property name="dst.dir" location="${build.dir}/deb/opt/havis-apps" />
+
+	<property name="lib.dir" location="${basedir}/lib" />
+
+	<property name="test.resources.dir" location="${basedir}/src/test/resources" />
+
+	<property file="${resources.dir}/build.properties" />
+	<property file="${resources.dir}/MANIFEST.MF" prefix="manifest" />
+
+	<filterset id="manifest" filtersfile="${resources.dir}/MANIFEST.MF" />
+
+	<property name="javac.version" value="8" />
+
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}" />
+	</path>
+
+	<!-- Checks if the build.properties file exists and sets the state to the property
+            "build.properties.exists" -->
+	<target name="check.build.properties">
+		<condition property="ivy.resolver" else="local">
+			<isset property="ivy.resolver" />
+		</condition>
+		<fail message="Missing property 'api.url'. Does 'build.properties' file exists?" unless="api.url" />
+		<fail message="Missing property 'ivy.url'. Does 'build.properties' file exists?" unless="ivy.url" />
+		<condition property="app" value="false">
+			<not>
+				<isset property="app"/>
+			</not>
+		</condition>
+	</target>
+
+	<target name="clean-cache" description="Cleans ivy cache">
+		<ivy:cleancache />
+	</target>
+
+	<target name="clean" description="Cleans the project">
+		<delete dir="${build.dir}" />
+		<delete dir="${lib.dir}" />
+	</target>
+
+	<target name="clean-all" depends="clean, clean-cache" description="Cleans the project and ivy cache" />
+
+	<target name="retrieve" depends="check.build.properties">
+		<ivy:retrieve conf="default" />
+	</target>
+
+	<macrodef name="xjc">
+		<attribute name="name" />
+		<attribute name="package" />
+		<attribute name="catalog" default="" />
+		<element name="bindings" optional="true" implicit="true" />
+		<sequential>
+			<taskdef name="xjc2" classname="com.sun.tools.xjc.XJC2Task" classpathref="build.classpath" />
+			<xjc2 schema="${resources.dir}/xsd/@{name}.xsd" destdir="${build.dir}/jaxb/src" package="@{package}" extension="true">
+				<arg value="-npa" />
+				<arg value="-verbose" />
+				<arg value="-Xannotate" />
+				<arg value="-episode" />
+				<arg value="${build.dir}/jaxb/binding/@{name}_xml" />
+				<bindings />
+			</xjc2>
+			<xslt style="${resources.dir}/style.xsl" in="${build.dir}/jaxb/binding/@{name}_xml" out="${build.dir}/jaxb/binding/@{name}.xml">
+				<param name="filename" expression="${resources.dir}/xsd/@{name}.xsd" type="STRING" />
+			</xslt>
+			<delete file="${build.dir}/jaxb/binding/@{name}_xml" />
+		</sequential>
+	</macrodef>
+
+	<!-- Checks if the existing JAXB classes are up to date -->
+	<target name="check.jaxb">
+		<uptodate property="uptodate.jaxb" targetfile="${build.dir}/jaxb/binding/hardware.xml">
+			<srcfiles dir="${resources.dir}/xsd" includes="*.xsd" />
+			<srcfiles dir="${resources.dir}/binding" includes="*.xml" />
+		</uptodate>
+	</target>
+
+	<target name="jaxb" depends="check.jaxb, retrieve" unless="uptodate.jaxb">
+		<delete dir="target/jaxb" />
+		<mkdir dir="target/jaxb/binding" />
+		<mkdir dir="target/jaxb/src" />
+		<xjc name="hardwareBase" package="havis.device.test.hardware" />
+		<xjc name="hardware" package="havis.device.test.hardware">
+			<binding dir="${resources.dir}/binding" includes="hardware.xml" />
+			<binding dir="${build.dir}/jaxb/binding" includes="hardwareBase.xml" />
+		</xjc>
+		<xjc name="hardwareOperation" package="havis.device.test.hardware">
+			<binding dir="${resources.dir}/binding" includes="hardwareOperation.xml" />
+			<binding dir="${build.dir}/jaxb/binding" includes="hardwareBase.xml" />
+		</xjc>
+		<mkdir dir="target/jaxb/classes" />
+		<javac destdir="${build.dir}/jaxb/classes" release="${javac.version}" debug="${javac.debug}" includeantruntime="false">
+			<src path="${build.dir}/jaxb/src" />
+			<classpath>
+				<path refid="build.classpath" />
+			</classpath>
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+	</target>
+
+	<!-- Compiles the java source code using javac -->
+	<target name="compile" depends="jaxb" description="Compile">
+		<mkdir dir="${build.dir.classes}" />
+		<javac srcdir="${src.main.dir}" destdir="${build.dir.classes}" release="${javac.version}" debug="${javac.debug}" includeantruntime="false">
+			<classpath>
+				<!-- external libraries -->
+				<path refid="build.classpath" />
+				<!-- jaxb classes -->
+				<pathelement location="${build.dir}/jaxb/classes" />
+			</classpath>
+		</javac>
+		<!-- add all classpath resources -->
+		<copy todir="${build.dir.classes}">
+			<fileset dir="${resources.dir.classpath}" />
+		</copy>
+	</target>
+
+	<!-- Compiles the test classes -->
+	<target name="prepare" depends="compile">
+		<!-- compile java classes -->
+		<mkdir dir="${build.dir.test}/classes" />
+		<javac srcdir="${src.test.dir}" destdir="${build.dir.test}/classes" release="${javac.version}" debug="${javac.debug}" includeantruntime="false">
+			<classpath>
+				<!-- build libraries -->
+				<path refid="build.classpath" />
+				<!-- jaxb classes -->
+				<pathelement location="${build.dir}/jaxb/classes" />
+				<!-- classes that shall be tested + resources -->
+				<pathelement location="${build.dir.classes}" />
+			</classpath>
+		</javac>
+		<!-- add all classpath resources -->
+		<copy todir="${build.dir.test.classes}">
+			<fileset dir="${test.resources.dir}/classpath" />
+		</copy>
+	</target>
+
+	<target name="test" depends="prepare" description="Runs all unit tests">
+		<sequential>
+			<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="build.classpath" />
+			<testng outputDir="${build.dir.test}/reports" workingdir="${build.dir.test}" verbose="2">
+				<classpath>
+					<!-- build libraries -->
+					<path refid="build.classpath" />
+					<!-- main classes + resources -->
+					<pathelement location="${build.dir.classes}" />
+					<!-- jaxb classes -->
+					<pathelement location="${build.dir}/jaxb/classes" />
+					<!-- classes that shall be tested + resources -->
+					<pathelement location="${build.dir.test.classes}" />
+				</classpath>
+				<xmlfileset dir="${basedir}" includes="**/testng.xml" />
+				<jvmarg line="-noverify -javaagent:${lib.dir}/jmockit-${jmockit.version}.jar -Djmockit-coverage-outputDir=${build.dir.test}/reports/coverage -Djmockit-coverage-srcDirs=${src.main.dir} -Djmockit-coverage-metrics=all" />
+			</testng>
+		</sequential>
+	</target>
+
+	<target name="jar" depends="compile">
+		<javac destdir="${build.dir.classes}" release="${javac.version}" debug="${javac.debug}" includeantruntime="false">
+			<src path="${src.main.dir}" />
+			<include name="havis/middleware/ale/client/*.java" />
+			<classpath>
+				<path refid="build.classpath" />
+				<pathelement location="${build.dir.classes}" />
+				<pathelement location="${build.dir}/jaxb/classes" />
+			</classpath>
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+
+		<jar jarfile="${build.dir}/${basename}.jar" manifest="${resources.dir}/MANIFEST.MF">
+			<fileset dir="${build.dir.classes}" />
+			<fileset dir="${build.dir}/jaxb/classes" />
+		</jar>
+
+	</target>
+
+	<target name="jar-doc" description="Creates a javadoc JAR of the implemented and generated classes">
+		<!-- create javadoc JAR -->
+		<javadoc destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="${javadoc.windowtitle}" doctitle="${javadoc.doctitle}" bottom="${javadoc.buttom}">
+			<packageset dir="${src.main.dir}" />
+			<packageset dir="${build.dir}/jaxb/src" />
+			<classpath>
+				<pathelement location="${src.main.dir}" />
+				<pathelement location="${build.dir}/jaxb/src" />
+				<path refid="build.classpath" />
+			</classpath>
+			<group title="Packages" packages="havis.middleware.*" />
+			<link offline="true" href="http://docs.oracle.com/javase/7/docs/api/" packagelistURL="${api.url}/javase/7/" />
+		</javadoc>
+		<jar jarfile="${build.dir}/${basename}-javadoc.jar" basedir="${doc.dir}" />
+	</target>
+
+	<target name="jar-src" depends="compile" description="Creates the source JAR">
+		<!-- create source JAR -->
+		<jar jarfile="${build.dir}/${basename}-sources.jar" basedir="${src.main.dir}">
+			<fileset dir="${src.main.dir}" />
+			<fileset dir="${build.dir}/jaxb/src" />
+			<fileset dir="${resources.dir}" includes="xsd/*" />
+		</jar>
+		<jar jarfile="${build.dir}/${basename}.fragment.jar" manifest="${resources.dir}/fragment/MANIFEST.MF" />
+	</target>
+
+	<target name="deb" depends="jar, jar-doc, jar-src">
+		<copy todir="${build.dir}/deb">
+			<fileset dir="${resources.dir}/deb/" includes="**/*.html DEBIAN/*" />
+			<filterset refid="manifest" />
+		</copy>
+
+		<copy todir="${build.dir}/deb">
+			<fileset dir="${resources.dir}/deb/" excludes="**/*.html DEBIAN/*" />
+		</copy>
+
+		<copy file="${build.dir}/${basename}.jar" tofile="${dst.dir}/bundle/40_${basename}.jar" />
+		<copy file="${build.dir}/${basename}.fragment.jar" tofile="${dst.dir}/bundle/10_${basename}.fragment.jar" />
+
+		<chmod perm="755" type="file">
+			<fileset dir="${build.dir}/deb/DEBIAN">
+				<include name="preinst" />
+				<include name="postinst" />
+				<include name="prerm" />
+				<include name="postrm" />
+			</fileset>
+		</chmod>
+
+		<exec executable="fakeroot">
+			<arg value="dpkg" />
+			<arg value="-b" />
+			<arg value="${build.dir}/deb" />
+			<arg value="${build.dir}/${basename}.deb" />
+		</exec>
+	</target>
+
+	<target name="app" depends="deb">
+		<copy file="${build.dir}/${basename}.deb" tofile="${build.dir}/tar-io/${basename}.deb" />
+		<copy file="${build.dir}/${basename}.deb" tofile="${build.dir}/tar-rf/${basename}.deb" />
+		<ivy:resolve file="ivy.xml" conf="runtime-io" />
+		<ivy:retrieve pattern="${build.dir}/tar-io/[artifact].[ext]" conf="runtime-io" />
+
+		<exec executable="fakeroot">
+			<arg value="tar" />
+			<arg value="cfC" />
+			<arg value="${build.dir}/${basename}.io.tar" />
+			<arg value="${build.dir}/tar-io" />
+			<arg value="." />
+		</exec>
+		<concat destfile="${build.dir}/havis.device.test.stub.io.app" binary="yes">
+			<fileset file="${resources.dir}/io/make" />
+			<fileset file="${build.dir}/${basename}.io.tar" />
+		</concat>
+
+		<ivy:resolve file="ivy.xml" conf="runtime-rf"/>
+		<ivy:retrieve pattern="${build.dir}/tar-rf/[artifact].[ext]" conf="runtime-rf" />
+
+		<exec executable="fakeroot">
+			<arg value="tar" />
+			<arg value="cfC" />
+			<arg value="${build.dir}/${basename}.rf.tar" />
+			<arg value="${build.dir}/tar-rf" />
+			<arg value="." />
+		</exec>
+		<concat destfile="${build.dir}/havis.device.test.stub.rf.app" binary="yes">
+			<fileset file="${resources.dir}/rf/make" />
+			<fileset file="${build.dir}/${basename}.rf.tar" />
+		</concat>
+	</target>
+
+	<target name="publish" depends="check.build.properties" description="Publishes the JAR files to the local ivy repository.">
+		<antcall>
+			<target name="deb" />
+			<target name="app" if:true="${app}" />
+		</antcall>
+		<ivy:resolve file="${resources.dir}/ivy.xml" unless:true="${app}" />
+		<ivy:publish resolver="${ivy.resolver}" pubrevision="${manifest.Bundle-Version}" status="integration" overwrite="true" unless:true="${app}">
+			<artifacts pattern="${build.dir}/[artifact].[ext]" />
+		</ivy:publish>
+		<ivy:resolve file="${resources.dir}/stub/ivy.xml" if:true="${app}" />
+		<ivy:publish resolver="${ivy.resolver}" pubrevision="${manifest.Bundle-Version}" status="integration" overwrite="true" if:true="${app}">
+			<artifacts pattern="${build.dir}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+
+	<target name="standalone" depends="deb">
+		<ivy:retrieve pattern="${build.dir}/[artifact].[ext]" conf="standalone" />
+		<exec executable="dpkg">
+			<arg value="-x" />
+			<arg value="${build.dir}/havis-apps.deb" />
+			<arg value="${build.dir}/deb" />
+		</exec>
+		<exec executable="dpkg">
+			<arg value="-x" />
+			<arg value="${build.dir}/havis.device.io.deb" />
+			<arg value="${build.dir}/deb" />
+		</exec>
+		<exec executable="dpkg">
+			<arg value="-x" />
+			<arg value="${build.dir}/havis.device.test.io.deb" />
+			<arg value="${build.dir}/deb" />
+		</exec>
+		<exec executable="dpkg">
+			<arg value="-x" />
+			<arg value="${build.dir}/havis.device.rf.deb" />
+			<arg value="${build.dir}/deb" />
+		</exec>
+		<exec executable="dpkg">
+			<arg value="-x" />
+			<arg value="${build.dir}/havis.device.test.rf.deb" />
+			<arg value="${build.dir}/deb" />
+		</exec>
+
+		<available file="${user.home}/.felix" property="standalone.felix.present" />
+		<copy file="${user.home}/.felix" tofile="${build.dir}/deb/etc/default/felix" overwrite="true" if:set="standalone.felix.present" />
+	</target>
+
+</project>

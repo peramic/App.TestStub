@@ -1,0 +1,42 @@
+name: Publish app
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+      - name: Publish app
+        id: build
+        uses: peramic/actions/build-stretch@v1
+        with:
+          arch: all
+          script: ./mkapp
+          token: ${{ secrets.ACTIONS }}
+          release: ${{ github.event.inputs.release }}
+        env:
+          APP: true
+      - name: Create Release
+        if: ${{ github.event.inputs.release }}
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.release }}
+          release_name: Release ${{ github.event.inputs.release }}
+      - name: Upload Release Asset
+        if: ${{ github.event.inputs.release && steps.build.outputs.APP }} 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ${{ steps.build.outputs.APP }}
+          asset_name: ${{ steps.build.outputs.APP }}
+          asset_content_type: application/octet-stream

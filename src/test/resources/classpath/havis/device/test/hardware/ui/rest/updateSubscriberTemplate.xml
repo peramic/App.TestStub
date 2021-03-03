@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hardwareOperation xmlns="urn:havis:device:test:hardware:xsd:1">
+	<request configId="default">
+		<update operationId="o1">
+			<subscribers>
+				<subscriber subscriberId="s1">
+					<instanceProperties>
+						<instanceProperty key="URL">callbackURL
+						</instanceProperty>
+						<instanceProperty key="connectionTimeout">5000</instanceProperty>
+						<instanceProperty key="socketTimeout">5000</instanceProperty>
+					</instanceProperties>
+					<ios>
+						<io ioId="1">
+							<stateChanged>true</stateChanged>
+						</io>
+					</ios>
+				</subscriber>
+			</subscribers>
+		</update>
+	</request>
+</hardwareOperation>
